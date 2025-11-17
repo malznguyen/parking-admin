@@ -77,7 +77,7 @@ export function generateVehicleModel(): string {
     return `${brand} ${model}`;
 }
 
-export function getRandomItem<T>(array: T[]): T {
+export function getRandomItem<T>(array: readonly T[]): T {
     return array[Math.floor(Math.random() * array.length)];
 }
 
