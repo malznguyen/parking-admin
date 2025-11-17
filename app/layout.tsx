@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { StoreProvider } from "@/components/providers";
+import { ToastContainer } from "@/components/ui/toast-container";
+import { GlobalLoading } from "@/components/ui/global-loading";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 export const metadata: Metadata = {
   title: "HaUI Smart Parking | Admin Dashboard",
@@ -16,7 +20,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi">
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <StoreProvider>
+          {children}
+          <ToastContainer />
+          <GlobalLoading />
+          <ConfirmDialog />
+        </StoreProvider>
+      </body>
     </html>
   );
 }
