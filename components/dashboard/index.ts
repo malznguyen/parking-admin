@@ -5,3 +5,5 @@ export { ChartContainer } from "./chart-container";
 export { SystemStatus } from "./system-status";
 export { RecentSessions } from "./recent-sessions";
 export { ActivityChart } from "./activity-chart";
+export { HeroSection } from "./hero-section";
+export { MetricCard } from "./metric-card";

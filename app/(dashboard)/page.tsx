@@ -1,6 +1,9 @@
-import { StatCard } from "@/components/dashboard/stat-card";
+"use client";
+
+import { useEffect, useState } from "react";
+import { HeroSection } from "@/components/dashboard/hero-section";
+import { MetricCard } from "@/components/dashboard/metric-card";
 import { ActivityChart } from "@/components/dashboard/activity-chart";
-import { SystemStatus } from "@/components/dashboard/system-status";
 import { RecentSessions } from "@/components/dashboard/recent-sessions";
 import {
   getCurrentlyParkedSessions,
@@ -9,9 +12,20 @@ import {
   calculateRevenue,
 } from "@/lib/mock-data";
 import { PARKING_CONFIG } from "@/lib/constants";
-import { ParkingCircle, Car, Banknote, AlertTriangle } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 
 export default function DashboardPage() {
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Update time every second
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Calculate real-time stats from mock data
   const currentlyParked = getCurrentlyParkedSessions();
   const availableSpots = PARKING_CONFIG.TOTAL_SPOTS - currentlyParked.length;
@@ -32,11 +46,25 @@ export default function DashboardPage() {
   );
 
   // Calculate trends (mock comparison with yesterday)
-  const yesterdayParked = currentlyParked.length - Math.floor(Math.random() * 20 - 10);
-  const parkedTrend = currentlyParked.length - yesterdayParked;
+  const yesterdayRevenue = todayRevenue * 0.88; // Mock: today is 12% higher
+  const revenueTrend = todayRevenue - yesterdayRevenue;
+  const parkedTrend = Math.floor(Math.random() * 10 - 5) + 3; // Mock: ±5 variance
+
+  // Manual refresh handler
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1000);
+  };
+
+  // Format currency
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("vi-VN").format(amount);
+  };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -44,166 +72,87 @@ export default function DashboardPage() {
             Tổng quan
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Giám sát thời gian thực bãi đỗ xe HaUI
+            Trung tâm điều khiển bãi đỗ xe HaUI
           </p>
         </div>
-        <div className="text-right">
-          <div className="text-xs text-muted-foreground uppercase tracking-industrial">
-            Cập nhật lúc
-          </div>
-          <div className="font-data text-sm text-foreground">
-            {new Date().toLocaleTimeString("vi-VN", {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <div className="animate-slide-in-up stagger-1">
-          <StatCard
-            label="Số chỗ trống"
-            value={availableSpots}
-            subValue={`/${PARKING_CONFIG.TOTAL_SPOTS}`}
-            trend={{
-              value: Math.abs(parkedTrend),
-              label: "so với hôm qua",
-              direction: parkedTrend > 0 ? "down" : "up",
-            }}
-            icon={ParkingCircle}
-            accentColor="primary"
-          />
-        </div>
-        <div className="animate-slide-in-up stagger-2">
-          <StatCard
-            label="Xe đang đỗ"
-            value={currentlyParked.length}
-            trend={{
-              value: Math.abs(parkedTrend),
-              label: "hôm nay",
-              direction: parkedTrend > 0 ? "up" : "down",
-            }}
-            icon={Car}
-            accentColor="info"
-          />
-        </div>
-        <div className="animate-slide-in-up stagger-3">
-          <StatCard
-            label="Doanh thu hôm nay"
-            value={new Intl.NumberFormat("vi-VN").format(todayRevenue)}
-            subValue="₫"
-            trend={{
-              value: Math.floor(todayRevenue * 0.12),
-              label: "so với hôm qua",
-              direction: "up",
-            }}
-            icon={Banknote}
-            accentColor="warning"
-          />
-        </div>
-        <div className="animate-slide-in-up stagger-4">
-          <StatCard
-            label="Lỗi LPR chờ xử lý"
-            value={pendingExceptions.length}
-            trend={{
-              value: pendingExceptions.filter((e) => e.priority === "urgent")
-                .length,
-              label: "khẩn cấp",
-              direction: "up",
-            }}
-            icon={AlertTriangle}
-            accentColor="danger"
-          />
-        </div>
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid gap-6 lg:grid-cols-12">
-        {/* Left Column - Charts and Activity */}
-        <div className="lg:col-span-8 space-y-6">
-          <ActivityChart />
-          <RecentSessions />
-        </div>
-
-        {/* Right Column - System Status */}
-        <div className="lg:col-span-4">
-          <SystemStatus />
-        </div>
-      </div>
-
-      {/* Quick Stats Footer */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-md bg-card border border-border p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase tracking-industrial">
-              Tỷ lệ lấp đầy
-            </span>
-            <span className="font-data text-lg font-bold text-primary">
-              {Math.round(
-                (currentlyParked.length / PARKING_CONFIG.TOTAL_SPOTS) * 100
-              )}
-              %
-            </span>
-          </div>
-          <div className="mt-2 h-2 w-full rounded-full bg-secondary overflow-hidden">
-            <div
-              className="h-full rounded-full bg-primary transition-all duration-500"
-              style={{
-                width: `${
-                  (currentlyParked.length / PARKING_CONFIG.TOTAL_SPOTS) * 100
-                }%`,
-              }}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handleRefresh}
+            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors uppercase tracking-industrial"
+            disabled={isRefreshing}
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
             />
+            Làm mới
+          </button>
+          <div className="text-right">
+            <div className="text-xs text-muted-foreground uppercase tracking-industrial">
+              Cập nhật lúc
+            </div>
+            <div className="font-data text-sm text-foreground tabular-nums">
+              {currentTime.toLocaleTimeString("vi-VN", {
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+              })}
+            </div>
           </div>
         </div>
+      </div>
 
-        <div className="rounded-md bg-card border border-border p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase tracking-industrial">
-              Xe vào hôm nay
-            </span>
-            <span className="font-data text-lg font-bold text-success">
-              {todaySessions.length}
-            </span>
-          </div>
-          <div className="mt-2 text-xs text-muted-foreground">
-            Trung bình:{" "}
-            <span className="font-data text-foreground">
-              {Math.floor(todaySessions.length / (new Date().getHours() || 1))}
-            </span>{" "}
-            xe/giờ
-          </div>
-        </div>
+      {/* Hero Section - Primary Zone */}
+      <HeroSection
+        availableSpots={availableSpots}
+        totalSpots={PARKING_CONFIG.TOTAL_SPOTS}
+        pendingExceptions={pendingExceptions.length}
+        systemStatus={
+          pendingExceptions.length > 10
+            ? "critical"
+            : pendingExceptions.length > 5
+            ? "warning"
+            : "normal"
+        }
+      />
 
-        <div className="rounded-md bg-card border border-border p-4">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground uppercase tracking-industrial">
-              Độ chính xác LPR
-            </span>
-            <span className="font-data text-lg font-bold text-success">
-              {(
-                (todaySessions.filter((s) => s.entryConfidence === "high")
-                  .length /
-                  todaySessions.length) *
-                100
-              ).toFixed(1)}
-              %
-            </span>
-          </div>
-          <div className="mt-2 text-xs text-muted-foreground">
-            Cao:{" "}
-            <span className="font-data text-success">
-              {todaySessions.filter((s) => s.entryConfidence === "high").length}
-            </span>{" "}
-            | Trung bình:{" "}
-            <span className="font-data text-warning">
-              {todaySessions.filter((s) => s.entryConfidence === "medium").length}
-            </span>
-          </div>
-        </div>
+      {/* Key Metrics - 2 Column Grid */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <MetricCard
+          label="Doanh thu hôm nay"
+          value={formatCurrency(todayRevenue)}
+          suffix="đ"
+          trend={{
+            value: formatCurrency(Math.abs(revenueTrend)),
+            label: "so với hôm qua",
+            direction: revenueTrend >= 0 ? "up" : "down",
+            isPositive: revenueTrend >= 0,
+          }}
+          accentColor="success"
+          animationDelay={200}
+        />
+        <MetricCard
+          label="Xe đang đỗ"
+          value={currentlyParked.length}
+          suffix="xe"
+          trend={{
+            value: Math.abs(parkedTrend),
+            label: "hôm nay",
+            direction: parkedTrend >= 0 ? "up" : "down",
+            isPositive: true, // More cars = more revenue
+          }}
+          accentColor="info"
+          animationDelay={300}
+        />
+      </div>
+
+      {/* Activity Chart Section - Secondary Zone */}
+      <div className="animate-slide-in-up" style={{ animationDelay: "400ms" }}>
+        <ActivityChart />
+      </div>
+
+      {/* Recent Sessions - Tertiary Zone */}
+      <div className="animate-slide-in-up" style={{ animationDelay: "500ms" }}>
+        <RecentSessions />
       </div>
     </div>
   );
