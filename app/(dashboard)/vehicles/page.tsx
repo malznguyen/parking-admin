@@ -48,6 +48,8 @@ export default function VehiclesPage() {
     toggleVehicleStatus,
     extendExpiry,
     isLoading,
+    filters: storeFilters,
+    searchQuery: storeSearchQuery,
   } = useVehicleStore();
   const { showConfirmDialog } = useUIStore();
 
@@ -110,7 +112,7 @@ export default function VehiclesPage() {
     }
 
     return vehicles;
-  }, [getFilteredVehicles, selectedStatus]);
+  }, [getFilteredVehicles, selectedStatus, storeFilters, storeSearchQuery, allVehicles]);
 
   // Pagination
   const totalPages = Math.ceil(filteredVehicles.length / itemsPerPage);

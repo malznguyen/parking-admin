@@ -48,7 +48,7 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-lg bg-card border border-border border-l-4 shadow-md p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg animate-slide-in-up",
+        "relative overflow-hidden rounded-lg bg-card border border-border border-l-4 shadow-md p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg animate-slide-in-up h-[100px]",
         accentColors[accentColor],
         className
       )}
@@ -57,17 +57,17 @@ export function MetricCard({
       }}
     >
       {/* Label */}
-      <div className="text-xs text-muted-foreground uppercase tracking-industrial font-semibold mb-4">
+      <div className="text-[10px] text-muted-foreground uppercase tracking-industrial font-semibold mb-2">
         {label}
       </div>
 
       {/* Value */}
-      <div className="flex items-baseline gap-1 mb-3">
-        <span className="text-4xl lg:text-5xl font-bold font-data text-foreground tracking-tight animate-count-up">
+      <div className="flex items-baseline gap-1 mb-2">
+        <span className="text-3xl lg:text-4xl font-bold font-data text-foreground tracking-tight animate-count-up">
           {value}
         </span>
         {suffix && (
-          <span className="text-lg lg:text-xl font-data text-muted-foreground">
+          <span className="text-base lg:text-lg font-data text-muted-foreground">
             {suffix}
           </span>
         )}
@@ -75,15 +75,15 @@ export function MetricCard({
 
       {/* Trend */}
       {trend && (
-        <div className="flex items-center gap-2">
-          <div className={cn("flex items-center gap-1", getTrendColor())}>
-            <TrendIcon className="h-4 w-4" />
-            <span className="text-sm font-semibold font-data">
+        <div className="flex items-center gap-1.5">
+          <div className={cn("flex items-center gap-0.5", getTrendColor())}>
+            <TrendIcon className="h-3.5 w-3.5" />
+            <span className="text-xs font-semibold font-data">
               {trend.direction === "up" ? "+" : trend.direction === "down" ? "-" : ""}
               {trend.value}
             </span>
           </div>
-          <span className="text-xs text-muted-foreground">{trend.label}</span>
+          <span className="text-[10px] text-muted-foreground">{trend.label}</span>
         </div>
       )}
     </div>
