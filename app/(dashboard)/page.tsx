@@ -64,14 +64,14 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       {/* Page Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-2xl uppercase tracking-industrial text-foreground">
+          <h1 className="font-display text-xl uppercase tracking-industrial text-foreground">
             Tổng quan
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             Trung tâm điều khiển bãi đỗ xe HaUI
           </p>
         </div>
@@ -116,7 +116,7 @@ export default function DashboardPage() {
       />
 
       {/* Key Metrics - 2 Column Grid */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <MetricCard
           label="Doanh thu hôm nay"
           value={formatCurrency(todayRevenue)}
