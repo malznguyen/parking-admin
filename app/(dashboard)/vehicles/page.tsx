@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { mockVehicles, searchVehicles } from "@/lib/mock-data";
+import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useVehicleStore } from "@/lib/stores/vehicle-store";
+import { useUIStore } from "@/lib/stores/ui-store";
 import { Vehicle } from "@/types/database";
 import {
   Search,
@@ -18,6 +20,7 @@ import {
   X,
   ArrowDown,
   ArrowUp,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,10 +33,24 @@ import {
 } from "@/components/ui/dialog";
 import { format, differenceInDays, isPast } from "date-fns";
 import { vi } from "date-fns/locale";
+import Link from "next/link";
 
 type TabType = "all" | "student" | "staff";
 
 export default function VehiclesPage() {
+  const router = useRouter();
+  const {
+    vehicles: allVehicles,
+    fetchVehicles,
+    setSearchQuery: setStoreSearchQuery,
+    setFilters,
+    getFilteredVehicles,
+    toggleVehicleStatus,
+    extendExpiry,
+    isLoading,
+  } = useVehicleStore();
+  const { showConfirmDialog } = useUIStore();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<TabType>("all");
   const [selectedType, setSelectedType] = useState<string>("all");
@@ -42,42 +59,58 @@ export default function VehiclesPage() {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const itemsPerPage = 10;
 
+  // Fetch vehicles on mount
+  useEffect(() => {
+    fetchVehicles();
+  }, [fetchVehicles]);
+
+  // Sync search query to store
+  useEffect(() => {
+    setStoreSearchQuery(searchQuery);
+  }, [searchQuery, setStoreSearchQuery]);
+
+  // Sync filters to store
+  useEffect(() => {
+    let typeFilter: any = "all";
+    if (activeTab === "student") {
+      typeFilter = "registered_monthly";
+    } else if (activeTab === "staff") {
+      typeFilter = "registered_staff";
+    } else if (selectedType !== "all") {
+      typeFilter = selectedType;
+    }
+
+    let statusFilter: any = "all";
+    if (selectedStatus === "active") {
+      statusFilter = "active";
+    } else if (selectedStatus === "expired") {
+      statusFilter = "expired";
+    } else if (selectedStatus === "expiring") {
+      // For "expiring soon", we'll filter after getting results
+      statusFilter = "all";
+    }
+
+    setFilters({ type: typeFilter, status: statusFilter });
+  }, [activeTab, selectedType, selectedStatus, setFilters]);
+
   // Filter vehicles based on search and filters
   const filteredVehicles = useMemo(() => {
-    let vehicles = searchQuery ? searchVehicles(searchQuery) : mockVehicles;
+    let vehicles = getFilteredVehicles();
 
-    // Filter by tab
-    if (activeTab === "student") {
-      vehicles = vehicles.filter((v) => v.type === "registered_monthly");
-    } else if (activeTab === "staff") {
-      vehicles = vehicles.filter((v) => v.type === "registered_staff");
-    }
-
-    // Filter by type dropdown
-    if (selectedType !== "all") {
-      vehicles = vehicles.filter((v) => v.type === selectedType);
-    }
-
-    // Filter by status
-    if (selectedStatus === "active") {
-      vehicles = vehicles.filter((v) => v.isActive);
-    } else if (selectedStatus === "expired") {
-      vehicles = vehicles.filter((v) => isPast(new Date(v.expiryDate)));
-    } else if (selectedStatus === "expiring") {
+    // Additional filter for "expiring soon"
+    if (selectedStatus === "expiring") {
       vehicles = vehicles.filter((v) => {
-        const daysLeft = differenceInDays(
-          new Date(v.expiryDate),
-          new Date()
-        );
+        const daysLeft = differenceInDays(new Date(v.expiryDate), new Date());
         return daysLeft > 0 && daysLeft <= 30;
       });
     }
 
     return vehicles;
-  }, [searchQuery, activeTab, selectedType, selectedStatus]);
+  }, [getFilteredVehicles, selectedStatus]);
 
   // Pagination
   const totalPages = Math.ceil(filteredVehicles.length / itemsPerPage);
@@ -89,12 +122,31 @@ export default function VehiclesPage() {
   // Counts for tabs
   const counts = useMemo(() => {
     return {
-      all: mockVehicles.length,
-      student: mockVehicles.filter((v) => v.type === "registered_monthly")
-        .length,
-      staff: mockVehicles.filter((v) => v.type === "registered_staff").length,
+      all: allVehicles.length,
+      student: allVehicles.filter((v) => v.type === "registered_monthly").length,
+      staff: allVehicles.filter((v) => v.type === "registered_staff").length,
     };
-  }, []);
+  }, [allVehicles]);
+
+  const handleToggleStatus = async (vehicle: Vehicle) => {
+    setIsProcessing(true);
+    try {
+      await toggleVehicleStatus(vehicle.id);
+    } finally {
+      setIsProcessing(false);
+      setShowDropdown(null);
+    }
+  };
+
+  const handleExtendExpiry = async (vehicle: Vehicle, months: number) => {
+    setIsProcessing(true);
+    try {
+      await extendExpiry(vehicle.id, months);
+    } finally {
+      setIsProcessing(false);
+      setShowDropdown(null);
+    }
+  };
 
   const getExpiryStatus = (expiryDate: string) => {
     const expiry = new Date(expiryDate);
@@ -152,10 +204,12 @@ export default function VehiclesPage() {
             Quản lý toàn bộ xe đăng ký trong hệ thống
           </p>
         </div>
-        <Button className="bg-primary hover:bg-[#009B7D] text-white shadow-brutal-sm gap-2">
-          <Plus className="h-4 w-4" />
-          Đăng ký xe mới
-        </Button>
+        <Link href="/registrations">
+          <Button className="bg-primary hover:bg-[#009B7D] text-white shadow-brutal-sm gap-2">
+            <Plus className="h-4 w-4" />
+            Đăng ký xe mới
+          </Button>
+        </Link>
       </div>
 
       {/* Search and Filters */}
@@ -248,10 +302,12 @@ export default function VehiclesPage() {
           <p className="mt-2 text-sm text-muted-foreground">
             Thêm xe đầu tiên của bạn
           </p>
-          <Button className="mt-6 bg-primary hover:bg-[#009B7D] text-white gap-2">
-            <Plus className="h-4 w-4" />
-            Đăng ký xe mới
-          </Button>
+          <Link href="/registrations">
+            <Button className="mt-6 bg-primary hover:bg-[#009B7D] text-white gap-2">
+              <Plus className="h-4 w-4" />
+              Đăng ký xe mới
+            </Button>
+          </Link>
         </div>
       ) : (
         <div className="bg-white rounded-lg border border-border shadow-brutal-sm overflow-hidden">
@@ -338,14 +394,26 @@ export default function VehiclesPage() {
                                 <Edit className="h-4 w-4" />
                                 Chỉnh sửa
                               </button>
-                              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-[#F8FAFB] transition-colors">
-                                <RefreshCw className="h-4 w-4" />
-                                Gia hạn
+                              <button
+                                onClick={() => handleExtendExpiry(vehicle, 6)}
+                                disabled={isProcessing}
+                                className="flex w-full items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-[#F8FAFB] transition-colors disabled:opacity-50"
+                              >
+                                <RefreshCw className={`h-4 w-4 ${isProcessing ? "animate-spin" : ""}`} />
+                                Gia hạn 6 tháng
                               </button>
                               <div className="my-1 border-t border-border" />
-                              <button className="flex w-full items-center gap-2 px-4 py-2 text-sm text-[#EF4444] hover:bg-[#FEE2E2] transition-colors">
+                              <button
+                                onClick={() => handleToggleStatus(vehicle)}
+                                disabled={isProcessing}
+                                className={`flex w-full items-center gap-2 px-4 py-2 text-sm transition-colors disabled:opacity-50 ${
+                                  vehicle.isActive
+                                    ? "text-[#EF4444] hover:bg-[#FEE2E2]"
+                                    : "text-[#10B981] hover:bg-[#D1FAE5]"
+                                }`}
+                              >
                                 <Trash2 className="h-4 w-4" />
-                                Vô hiệu hóa
+                                {vehicle.isActive ? "Vô hiệu hóa" : "Kích hoạt lại"}
                               </button>
                             </div>
                           </div>
@@ -547,9 +615,14 @@ export default function VehiclesPage() {
                 <Button
                   variant="outline"
                   className="gap-2 border-primary text-primary hover:bg-[#E0F7F4]"
+                  onClick={() => {
+                    handleExtendExpiry(selectedVehicle, 6);
+                    setShowDetailModal(false);
+                  }}
+                  disabled={isProcessing}
                 >
-                  <RefreshCw className="h-4 w-4" />
-                  Gia hạn
+                  <RefreshCw className={`h-4 w-4 ${isProcessing ? "animate-spin" : ""}`} />
+                  Gia hạn 6 tháng
                 </Button>
                 <Button
                   variant="outline"

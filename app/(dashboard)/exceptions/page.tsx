@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { getPendingExceptions, mockVehicles } from "@/lib/mock-data";
+import { useState, useMemo, useEffect } from "react";
+import { useExceptionStore } from "@/lib/stores/exception-store";
+import { useVehicleStore } from "@/lib/stores/vehicle-store";
+import { useUIStore } from "@/lib/stores/ui-store";
 import { LPRException } from "@/types/database";
 import {
   AlertTriangle,
@@ -13,6 +15,7 @@ import {
   ArrowDown,
   ArrowUp,
   Camera,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +24,18 @@ import { formatDistanceToNow, format } from "date-fns";
 import { vi } from "date-fns/locale";
 
 export default function ExceptionsPage() {
+  const {
+    fetchExceptions,
+    getPendingExceptions,
+    resolveException,
+    getSimilarPlates,
+    setPriorityFilter: setStorePriorityFilter,
+    setGateFilter: setStoreGateFilter,
+    isLoading,
+  } = useExceptionStore();
+  const { vehicles } = useVehicleStore();
+  const { showError, showWarning } = useUIStore();
+
   const [selectedException, setSelectedException] =
     useState<LPRException | null>(null);
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
@@ -28,19 +43,78 @@ export default function ExceptionsPage() {
   const [manualPlate, setManualPlate] = useState("");
   const [notes, setNotes] = useState("");
   const [zoom, setZoom] = useState(1);
+  const [isResolving, setIsResolving] = useState(false);
+
+  // Fetch exceptions on mount
+  useEffect(() => {
+    fetchExceptions();
+  }, [fetchExceptions]);
+
+  // Update store filters when local state changes
+  useEffect(() => {
+    setStorePriorityFilter(priorityFilter as any);
+  }, [priorityFilter, setStorePriorityFilter]);
+
+  useEffect(() => {
+    setStoreGateFilter(gateFilter as any);
+  }, [gateFilter, setStoreGateFilter]);
 
   const pendingExceptions = useMemo(() => {
-    let exceptions = getPendingExceptions();
+    return getPendingExceptions();
+  }, [getPendingExceptions]);
 
-    if (priorityFilter !== "all") {
-      exceptions = exceptions.filter((e) => e.priority === priorityFilter);
-    }
-    if (gateFilter !== "all") {
-      exceptions = exceptions.filter((e) => e.gate === gateFilter);
+  const handleConfirmOpen = async () => {
+    if (!selectedException) return;
+
+    if (!manualPlate.trim()) {
+      showError("Vui lòng nhập biển số xe");
+      return;
     }
 
-    return exceptions;
-  }, [priorityFilter, gateFilter]);
+    setIsResolving(true);
+    try {
+      await resolveException(selectedException.id, {
+        resolvedPlate: manualPlate.toUpperCase(),
+        method: "manual_input",
+        notes: notes || undefined,
+        action: "allow",
+      });
+
+      // Clear form and selection
+      setManualPlate("");
+      setNotes("");
+      setSelectedException(null);
+    } catch (error) {
+      // Error already shown by store
+      console.error("Resolution failed:", error);
+    } finally {
+      setIsResolving(false);
+    }
+  };
+
+  const handleDeny = async () => {
+    if (!selectedException) return;
+
+    setIsResolving(true);
+    try {
+      await resolveException(selectedException.id, {
+        resolvedPlate: manualPlate.toUpperCase() || "DENIED",
+        method: "denied_entry",
+        notes: notes || "Từ chối vào/ra bãi",
+        action: "deny",
+      });
+
+      // Clear form and selection
+      setManualPlate("");
+      setNotes("");
+      setSelectedException(null);
+    } catch (error) {
+      // Error already shown by store
+      console.error("Denial failed:", error);
+    } finally {
+      setIsResolving(false);
+    }
+  };
 
   const getPriorityBadge = (priority: LPRException["priority"]) => {
     const styles = {
@@ -93,24 +167,12 @@ export default function ExceptionsPage() {
   // Get suggestions based on detected plate
   const suggestions = useMemo(() => {
     if (!selectedException?.detectedPlate) return [];
-    const detected = selectedException.detectedPlate;
-    return mockVehicles
-      .filter((v) => {
-        // Simple fuzzy match - check if plates share most characters
-        let matches = 0;
-        const plateChars = v.licensePlate.replace("-", "").split("");
-        const detectedChars = detected.replace("-", "").split("");
-        plateChars.forEach((char, i) => {
-          if (detectedChars[i] === char) matches++;
-        });
-        return matches >= detectedChars.length - 2;
-      })
-      .slice(0, 3)
-      .map((v) => ({
-        plate: v.licensePlate,
-        description: `${v.type === "registered_monthly" ? "Xe đăng ký - SV" : "Xe đăng ký - CBGV"} ${v.ownerName.split(" ").pop()}`,
-      }));
-  }, [selectedException]);
+    const similarPlates = getSimilarPlates(selectedException.detectedPlate);
+    return similarPlates.slice(0, 3).map((s) => ({
+      plate: s.plate,
+      description: `${s.vehicleType === "registered_monthly" ? "Xe đăng ký - SV" : "Xe đăng ký - CBGV"} ${s.ownerName?.split(" ").pop() || ""} [${s.confidence}%]`,
+    }));
+  }, [selectedException, getSimilarPlates]);
 
   return (
     <div className="space-y-6 animate-fade-scale-in">
@@ -417,16 +479,27 @@ export default function ExceptionsPage() {
                 <div className="flex gap-3 mt-4">
                   <Button
                     className="flex-1 h-12 bg-primary hover:bg-[#009B7D] text-white font-bold gap-2"
-                    disabled={!manualPlate}
+                    disabled={!manualPlate || isResolving}
+                    onClick={handleConfirmOpen}
                   >
-                    <Check className="h-4 w-4" />
+                    {isResolving ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Check className="h-4 w-4" />
+                    )}
                     Xác nhận mở rào
                   </Button>
                   <Button
                     variant="outline"
                     className="flex-1 h-12 border-[#EF4444] text-[#EF4444] hover:bg-[#FEE2E2] font-bold gap-2"
+                    disabled={isResolving}
+                    onClick={handleDeny}
                   >
-                    <X className="h-4 w-4" />
+                    {isResolving ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <X className="h-4 w-4" />
+                    )}
                     Từ chối
                   </Button>
                 </div>

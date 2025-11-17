@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { searchVehicles } from "@/lib/mock-data";
+import { useRouter } from "next/navigation";
+import { useVehicleStore } from "@/lib/stores/vehicle-store";
+import { useUIStore } from "@/lib/stores/ui-store";
 import {
   ArrowLeft,
   GraduationCap,
@@ -10,6 +12,7 @@ import {
   Check,
   AlertCircle,
   Star,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +25,10 @@ type RegistrationType = "student" | "staff" | null;
 type PackageDuration = 1 | 3 | 6 | 12;
 
 export default function RegistrationsPage() {
+  const router = useRouter();
+  const { checkDuplicatePlate, addVehicle, isLoading } = useVehicleStore();
+  const { showError, showWarning } = useUIStore();
+
   const [registrationType, setRegistrationType] =
     useState<RegistrationType>(null);
   const [formData, setFormData] = useState({
@@ -39,6 +46,8 @@ export default function RegistrationsPage() {
     "idle" | "checking" | "available" | "taken"
   >("idle");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
 
   const packages = [
     { duration: 1, price: 100000, label: "1 tháng" },
@@ -48,12 +57,118 @@ export default function RegistrationsPage() {
   ];
 
   const checkPlateAvailability = () => {
-    if (!formData.licensePlate) return;
+    if (!formData.licensePlate) {
+      showWarning("Vui lòng nhập biển số xe");
+      return;
+    }
     setPlateCheckStatus("checking");
     setTimeout(() => {
-      const exists = searchVehicles(formData.licensePlate).length > 0;
-      setPlateCheckStatus(exists ? "taken" : "available");
-    }, 1000);
+      const isDuplicate = checkDuplicatePlate(formData.licensePlate.toUpperCase());
+      setPlateCheckStatus(isDuplicate ? "taken" : "available");
+    }, 500);
+  };
+
+  const validateForm = (): boolean => {
+    const errors: Record<string, string> = {};
+
+    if (!formData.fullName.trim()) {
+      errors.fullName = "Vui lòng nhập họ và tên";
+    }
+
+    if (!formData.idNumber.trim()) {
+      errors.idNumber = registrationType === "student"
+        ? "Vui lòng nhập MSSV"
+        : "Vui lòng nhập mã CBGV";
+    }
+
+    if (!formData.department) {
+      errors.department = "Vui lòng chọn khoa/phòng ban";
+    }
+
+    if (!formData.phone.trim()) {
+      errors.phone = "Vui lòng nhập số điện thoại";
+    } else if (!/^(0[0-9]{9,10})$/.test(formData.phone.replace(/\s/g, ""))) {
+      errors.phone = "Số điện thoại không hợp lệ";
+    }
+
+    if (!formData.licensePlate.trim()) {
+      errors.licensePlate = "Vui lòng nhập biển số xe";
+    } else if (!/^[0-9]{2}[A-Z][0-9]?-[0-9]{3,5}$/.test(formData.licensePlate.toUpperCase())) {
+      errors.licensePlate = "Biển số không đúng định dạng (VD: 29X1-12345)";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!registrationType) return;
+
+    // Validate form
+    if (!validateForm()) {
+      showError("Vui lòng điền đầy đủ thông tin bắt buộc");
+      return;
+    }
+
+    // Check duplicate plate
+    if (checkDuplicatePlate(formData.licensePlate.toUpperCase())) {
+      showError("Biển số xe đã tồn tại trong hệ thống");
+      setPlateCheckStatus("taken");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Calculate dates
+      const registrationDate = new Date();
+      const expiryDate = addMonths(registrationDate, selectedPackage);
+
+      // Prepare vehicle data
+      const vehicleData = {
+        licensePlate: formData.licensePlate.toUpperCase(),
+        type: registrationType === "student" ? "registered_monthly" as const : "registered_staff" as const,
+        ownerName: formData.fullName,
+        phoneNumber: formData.phone,
+        email: formData.email || undefined,
+        studentId: registrationType === "student" ? formData.idNumber : undefined,
+        staffId: registrationType === "staff" ? formData.idNumber : undefined,
+        department: formData.department,
+        vehicleModel: formData.vehicleModel || undefined,
+        color: formData.vehicleColor || undefined,
+        registrationDate: registrationDate.toISOString(),
+        expiryDate: expiryDate.toISOString(),
+        isActive: true,
+      };
+
+      // Add vehicle to store
+      await addVehicle(vehicleData);
+
+      // Reset form
+      setFormData({
+        fullName: "",
+        idNumber: "",
+        department: "",
+        phone: "",
+        email: "",
+        licensePlate: "",
+        vehicleModel: "",
+        vehicleColor: "",
+      });
+      setRegistrationType(null);
+      setPlateCheckStatus("idle");
+      setValidationErrors({});
+
+      // Redirect to vehicles page after short delay
+      setTimeout(() => {
+        router.push("/vehicles");
+      }, 1500);
+    } catch (error) {
+      // Error already shown by store
+      console.error("Registration failed:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -171,8 +286,11 @@ export default function RegistrationsPage() {
                   value={formData.fullName}
                   onChange={(e) => handleInputChange("fullName", e.target.value)}
                   placeholder="Nguyễn Văn An"
-                  className="h-12"
+                  className={`h-12 ${validationErrors.fullName ? "border-[#EF4444]" : ""}`}
                 />
+                {validationErrors.fullName && (
+                  <p className="text-sm text-[#EF4444] mt-1">{validationErrors.fullName}</p>
+                )}
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -190,8 +308,11 @@ export default function RegistrationsPage() {
                         ? "SV2021xxxxx"
                         : "GV-xxxx"
                     }
-                    className="h-12 font-mono"
+                    className={`h-12 font-mono ${validationErrors.idNumber ? "border-[#EF4444]" : ""}`}
                   />
+                  {validationErrors.idNumber && (
+                    <p className="text-sm text-[#EF4444] mt-1">{validationErrors.idNumber}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-foreground mb-2">
@@ -202,7 +323,7 @@ export default function RegistrationsPage() {
                     onChange={(e) =>
                       handleInputChange("department", e.target.value)
                     }
-                    className="h-12 w-full rounded-md border border-border bg-white px-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    className={`h-12 w-full rounded-md border bg-white px-3 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 ${validationErrors.department ? "border-[#EF4444]" : "border-border"}`}
                   >
                     <option value="">Chọn khoa</option>
                     <option value="cntt">Công nghệ thông tin</option>
@@ -212,6 +333,9 @@ export default function RegistrationsPage() {
                     <option value="kinh-te">Kinh tế</option>
                     <option value="ngoai-ngu">Ngoại ngữ</option>
                   </select>
+                  {validationErrors.department && (
+                    <p className="text-sm text-[#EF4444] mt-1">{validationErrors.department}</p>
+                  )}
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -223,8 +347,11 @@ export default function RegistrationsPage() {
                     value={formData.phone}
                     onChange={(e) => handleInputChange("phone", e.target.value)}
                     placeholder="0912345678"
-                    className="h-12 font-mono"
+                    className={`h-12 font-mono ${validationErrors.phone ? "border-[#EF4444]" : ""}`}
                   />
+                  {validationErrors.phone && (
+                    <p className="text-sm text-[#EF4444] mt-1">{validationErrors.phone}</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-bold text-foreground mb-2">
@@ -261,7 +388,7 @@ export default function RegistrationsPage() {
                       )
                     }
                     placeholder="29X1-12345"
-                    className="h-12 font-mono text-lg font-bold uppercase flex-1"
+                    className={`h-12 font-mono text-lg font-bold uppercase flex-1 ${validationErrors.licensePlate ? "border-[#EF4444]" : ""}`}
                   />
                   <Button
                     variant="outline"
@@ -287,6 +414,9 @@ export default function RegistrationsPage() {
                     <AlertCircle className="h-4 w-4" />
                     Biển số đã được đăng ký
                   </div>
+                )}
+                {validationErrors.licensePlate && (
+                  <p className="text-sm text-[#EF4444] mt-1">{validationErrors.licensePlate}</p>
                 )}
               </div>
 
@@ -474,11 +604,27 @@ export default function RegistrationsPage() {
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-4">
-            <Button variant="outline" className="h-12 px-8">
+            <Button
+              variant="outline"
+              className="h-12 px-8"
+              onClick={() => setRegistrationType(null)}
+              disabled={isSubmitting}
+            >
               Hủy bỏ
             </Button>
-            <Button className="h-12 px-8 bg-primary hover:bg-[#009B7D] text-white font-bold">
-              Đăng ký ngay
+            <Button
+              className="h-12 px-8 bg-primary hover:bg-[#009B7D] text-white font-bold gap-2"
+              onClick={handleSubmit}
+              disabled={isSubmitting || plateCheckStatus === "taken"}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Đang đăng ký...
+                </>
+              ) : (
+                "Đăng ký ngay"
+              )}
             </Button>
           </div>
         </>
