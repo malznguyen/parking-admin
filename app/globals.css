@@ -3,7 +3,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Industrial Neo-Brutalist Theme for HaUI Smart Parking */
+/* Industrial Neo-Brutalist Theme for HaUI Smart Parking - LIGHT THEME */
 @theme inline {
   /* Font Variables - System fonts as fallback (Google Fonts blocked in build env) */
   --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -11,7 +11,7 @@
   --font-display: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   --font-data: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
-  /* Core Colors - Industrial Dark Theme */
+  /* Core Colors - Industrial Light Theme */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -31,7 +31,7 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* Chart Colors - Hanoi Night Market Inspired */
+  /* Chart Colors */
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -65,93 +65,102 @@
   /* Base radius for industrial sharpness */
   --radius: 4px;
 
-  /* Light theme (backup, not primary) */
-  --background: oklch(0.98 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.75 0.18 175); /* Cyan-green */
-  --primary-foreground: oklch(0.15 0 0);
-  --secondary: oklch(0.95 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.95 0 0);
-  --muted-foreground: oklch(0.45 0 0);
-  --accent: oklch(0.95 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.65 0.25 25);
-  --border: oklch(0.9 0 0);
-  --input: oklch(0.9 0 0);
-  --ring: oklch(0.75 0.18 175);
+  /* Light Theme - PRIMARY (Professional Clean Interface) */
+  /* Base Tones */
+  --background: #FFFFFF;
+  --foreground: #0F172A;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
 
-  /* Industrial Chart Colors */
-  --chart-1: oklch(0.75 0.18 175); /* Cyan-green #00E5B8 */
-  --chart-2: oklch(0.65 0.2 265); /* Electric blue #667EEA */
-  --chart-3: oklch(0.8 0.18 85); /* Golden yellow #FFB800 */
-  --chart-4: oklch(0.65 0.25 25); /* Neon red #FF3D57 */
-  --chart-5: oklch(0.72 0.2 160); /* Vibrant green #00D68F */
+  /* Primary - Cyan-green (adjusted for light background) */
+  --primary: #00B894;
+  --primary-foreground: #FFFFFF;
 
-  /* Sidebar */
-  --sidebar: oklch(0.15 0.01 250);
-  --sidebar-foreground: oklch(0.98 0 0);
-  --sidebar-primary: oklch(0.75 0.18 175);
-  --sidebar-primary-foreground: oklch(0.15 0 0);
-  --sidebar-accent: oklch(0.2 0.01 250);
-  --sidebar-accent-foreground: oklch(0.98 0 0);
-  --sidebar-border: oklch(0.25 0.01 250);
-  --sidebar-ring: oklch(0.75 0.18 175);
+  /* Secondary - Light gray surface */
+  --secondary: #F8FAFB;
+  --secondary-foreground: #475569;
 
-  /* Industrial Accents */
-  --success: oklch(0.72 0.2 160);
-  --warning: oklch(0.8 0.18 85);
-  --info: oklch(0.7 0.2 240);
-  --danger: oklch(0.65 0.25 25);
+  /* Muted - For subdued elements */
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
+
+  /* Accent */
+  --accent: #F8FAFB;
+  --accent-foreground: #0F172A;
+
+  /* Destructive */
+  --destructive: #EF4444;
+
+  /* Borders and Input */
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #00B894;
+
+  /* Chart Colors - Adjusted for light background */
+  --chart-1: #00B894;
+  --chart-2: #0EA5E9;
+  --chart-3: #F59E0B;
+  --chart-4: #EF4444;
+  --chart-5: #10B981;
+
+  /* Sidebar - Light theme sidebar */
+  --sidebar: #F8FAFB;
+  --sidebar-foreground: #0F172A;
+  --sidebar-primary: #00B894;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E0F7F4;
+  --sidebar-accent-foreground: #0F172A;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #00B894;
+
+  /* Industrial Accents - Adjusted for light theme contrast */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --info: #0EA5E9;
+  --danger: #EF4444;
+
+  /* Additional Light Theme Colors */
+  --primary-light: #E0F7F4;
+  --warning-light: #FEF3C7;
+  --danger-light: #FEE2E2;
+  --success-light: #D1FAE5;
+  --info-light: #E0F2FE;
+
+  /* Text Hierarchy */
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-tertiary: #94A3B8;
+  --text-disabled: #CBD5E0;
 }
 
-/* Dark Theme - PRIMARY (Command Center) */
+/* Dark Theme - BACKUP (kept for potential future toggle) */
 .dark {
-  /* Base Tones - Deep Charcoal */
-  --background: oklch(0.12 0.01 250); /* #0A0E14 */
-  --foreground: oklch(1 0 0); /* Pure white text */
-  --card: oklch(0.18 0.01 250); /* #1E242E elevated surface */
+  --background: oklch(0.12 0.01 250);
+  --foreground: oklch(1 0 0);
+  --card: oklch(0.18 0.01 250);
   --card-foreground: oklch(1 0 0);
   --popover: oklch(0.18 0.01 250);
   --popover-foreground: oklch(1 0 0);
-
-  /* Primary - Cyan-green (xe ôm vest inspired) */
-  --primary: oklch(0.78 0.18 172); /* #00E5B8 */
+  --primary: oklch(0.78 0.18 172);
   --primary-foreground: oklch(0.12 0.01 250);
-
-  /* Secondary - Elevated Surface */
-  --secondary: oklch(0.2 0.01 250); /* Slightly lighter surface */
+  --secondary: oklch(0.2 0.01 250);
   --secondary-foreground: oklch(1 0 0);
-
-  /* Muted - For subdued elements */
   --muted: oklch(0.25 0.01 250);
-  --muted-foreground: oklch(0.7 0 0); /* 70% opacity equivalent */
-
-  /* Accent - Info blue */
+  --muted-foreground: oklch(0.7 0 0);
   --accent: oklch(0.2 0.01 250);
   --accent-foreground: oklch(1 0 0);
-
-  /* Destructive - Neon red brake lights */
-  --destructive: oklch(0.68 0.24 22); /* #FF3D57 */
-
-  /* Borders and Input */
-  --border: oklch(0.28 0.01 250); /* #2D3540 */
+  --destructive: oklch(0.68 0.24 22);
+  --border: oklch(0.28 0.01 250);
   --input: oklch(0.22 0.01 250);
   --ring: oklch(0.78 0.18 172);
-
-  /* Chart Colors - Hanoi Night Market Neons */
-  --chart-1: oklch(0.78 0.18 172); /* Cyan-green */
-  --chart-2: oklch(0.65 0.2 265); /* Purple-blue */
-  --chart-3: oklch(0.82 0.17 85); /* Golden yellow */
-  --chart-4: oklch(0.68 0.24 22); /* Neon red */
-  --chart-5: oklch(0.74 0.2 158); /* Vibrant green */
-
-  /* Sidebar - Industrial Dark */
-  --sidebar: oklch(0.15 0.01 250); /* #151920 */
+  --chart-1: oklch(0.78 0.18 172);
+  --chart-2: oklch(0.65 0.2 265);
+  --chart-3: oklch(0.82 0.17 85);
+  --chart-4: oklch(0.68 0.24 22);
+  --chart-5: oklch(0.74 0.2 158);
+  --sidebar: oklch(0.15 0.01 250);
   --sidebar-foreground: oklch(1 0 0);
   --sidebar-primary: oklch(0.78 0.18 172);
   --sidebar-primary-foreground: oklch(0.12 0.01 250);
@@ -159,12 +168,10 @@
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(0.28 0.01 250);
   --sidebar-ring: oklch(0.78 0.18 172);
-
-  /* Additional Industrial Accents */
-  --success: oklch(0.74 0.2 158); /* #00D68F */
-  --warning: oklch(0.82 0.17 85); /* #FFB800 */
-  --info: oklch(0.7 0.2 240); /* #00A3FF */
-  --danger: oklch(0.68 0.24 22); /* #FF3D57 */
+  --success: oklch(0.74 0.2 158);
+  --warning: oklch(0.82 0.17 85);
+  --info: oklch(0.7 0.2 240);
+  --danger: oklch(0.68 0.24 22);
 }
 
 @layer base {
@@ -206,37 +213,45 @@
     text-wrap: balance;
   }
 
-  /* Industrial Shadow System */
+  /* Light Theme Shadow System - Softer shadows */
   .shadow-brutal {
     box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.3),
-      0 4px 8px rgba(0, 0, 0, 0.25),
-      0 8px 24px rgba(0, 0, 0, 0.4);
+      0 1px 3px rgba(0, 0, 0, 0.08),
+      0 4px 6px rgba(0, 0, 0, 0.05),
+      0 10px 15px rgba(0, 0, 0, 0.08);
   }
 
   .shadow-brutal-sm {
     box-shadow:
-      0 1px 2px rgba(0, 0, 0, 0.2),
-      0 2px 8px rgba(0, 0, 0, 0.3);
+      0 1px 2px rgba(0, 0, 0, 0.06),
+      0 2px 4px rgba(0, 0, 0, 0.04);
   }
 
   .shadow-brutal-lg {
     box-shadow:
-      0 2px 4px rgba(0, 0, 0, 0.3),
-      0 8px 16px rgba(0, 0, 0, 0.35),
-      0 16px 48px rgba(0, 0, 0, 0.5);
+      0 2px 4px rgba(0, 0, 0, 0.08),
+      0 10px 20px rgba(0, 0, 0, 0.1),
+      0 20px 40px rgba(0, 0, 0, 0.08);
   }
 
   .shadow-glow-primary {
-    box-shadow: 0 0 24px oklch(0.78 0.18 172 / 0.3);
+    box-shadow: 0 8px 24px rgba(0, 184, 148, 0.15);
   }
 
   .shadow-glow-danger {
-    box-shadow: 0 0 24px oklch(0.68 0.24 22 / 0.3);
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.15);
   }
 
   .shadow-glow-warning {
-    box-shadow: 0 0 24px oklch(0.82 0.17 85 / 0.3);
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.15);
+  }
+
+  .shadow-glow-info {
+    box-shadow: 0 8px 24px rgba(14, 165, 233, 0.15);
+  }
+
+  .shadow-glow-success {
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.15);
   }
 
   /* Industrial Border Utilities */
@@ -264,13 +279,26 @@
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    opacity: 0.7;
+    color: var(--text-secondary);
   }
 
   .license-plate {
     font-family: var(--font-data);
     font-weight: 700;
     letter-spacing: 0.05em;
+  }
+
+  /* Light Theme Specific Utilities */
+  .bg-surface {
+    background-color: #F8FAFB;
+  }
+
+  .bg-surface-elevated {
+    background-color: #FFFFFF;
+  }
+
+  .border-strong {
+    border-color: #CBD5E0;
   }
 }
 
@@ -297,6 +325,17 @@
   }
 }
 
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 @keyframes fadeScaleIn {
   from {
     opacity: 0;
@@ -319,10 +358,10 @@
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 12px oklch(0.78 0.18 172 / 0.3);
+    box-shadow: 0 0 12px rgba(0, 184, 148, 0.2);
   }
   50% {
-    box-shadow: 0 0 24px oklch(0.78 0.18 172 / 0.5);
+    box-shadow: 0 0 24px rgba(0, 184, 148, 0.35);
   }
 }
 
@@ -337,6 +376,12 @@
   }
 }
 
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
 /* Animation Classes */
 .animate-slide-in-left {
   animation: slideInLeft 0.3s ease-out;
@@ -344,6 +389,10 @@
 
 .animate-slide-in-up {
   animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
 }
 
 .animate-fade-scale-in {
@@ -354,9 +403,9 @@
   animation: shimmer 2s infinite linear;
   background: linear-gradient(
     90deg,
-    oklch(0.25 0.01 250) 25%,
-    oklch(0.3 0.01 250) 50%,
-    oklch(0.25 0.01 250) 75%
+    #F1F5F9 25%,
+    #E2E8F0 50%,
+    #F1F5F9 75%
   );
   background-size: 200% 100%;
 }
@@ -369,6 +418,10 @@
   animation: count-up 0.6s ease-out;
 }
 
+.animate-shake {
+  animation: shake 0.3s ease-out;
+}
+
 /* Stagger Animation Delays */
 .stagger-1 { animation-delay: 100ms; }
 .stagger-2 { animation-delay: 200ms; }
@@ -376,33 +429,39 @@
 .stagger-4 { animation-delay: 400ms; }
 .stagger-5 { animation-delay: 500ms; }
 
-/* Industrial Scrollbar */
+/* Light Theme Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: oklch(0.15 0.01 250);
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: oklch(0.35 0.01 250);
+  background: #CBD5E0;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.45 0.01 250);
+  background: #94A3B8;
 }
 
-/* Selection Color */
+/* Selection Color - Light Theme */
 ::selection {
-  background: oklch(0.78 0.18 172 / 0.3);
-  color: oklch(1 0 0);
+  background: rgba(0, 184, 148, 0.2);
+  color: #0F172A;
 }
 
-/* Focus Visible Ring - Industrial Style */
+/* Focus Visible Ring - Light Theme */
 *:focus-visible {
-  outline: 2px solid oklch(0.78 0.18 172);
+  outline: 2px solid #00B894;
   outline-offset: 2px;
+}
+
+/* Table hover effect for light theme */
+.table-row-hover:hover {
+  background-color: #F8FAFB;
+  border-left: 3px solid #00B894;
 }
