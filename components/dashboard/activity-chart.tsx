@@ -106,14 +106,14 @@ const CustomTooltip = ({
 export function ActivityChart() {
   return (
     <ChartContainer
-      title="Hoạt động 24 giờ"
-      subtitle="Lưu lượng xe vào/ra và tỷ lệ lấp đầy"
+      title="Biểu đồ lưu lượng xe 24 giờ qua"
+      subtitle="Lưu lượng xe vào/ra và tỷ lệ lấp đầy theo giờ"
     >
-      <div className="h-[240px]">
+      <div className="h-[360px]">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}
-            margin={{ top: 5, right: 10, left: -20, bottom: 0 }}
+            margin={{ top: 10, right: 20, left: -10, bottom: 5 }}
           >
             <defs>
               <linearGradient id="occupancyGradient" x1="0" y1="0" x2="0" y2="1">

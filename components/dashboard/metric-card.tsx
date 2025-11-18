@@ -48,8 +48,8 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-lg bg-card border border-border border-l-4 shadow-md p-4 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg animate-slide-in-up h-[100px]",
-        accentColors[accentColor],
+        "relative overflow-hidden rounded-2xl bg-card border border-border border-t-4 shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-8 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(0,0,0,0.12)] animate-slide-in-up h-[200px] flex flex-col justify-between",
+        accentColors[accentColor].replace('border-l-', 'border-t-'),
         className
       )}
       style={{
@@ -57,33 +57,35 @@ export function MetricCard({
       }}
     >
       {/* Label */}
-      <div className="text-[10px] text-muted-foreground uppercase tracking-industrial font-semibold mb-2">
+      <div className="text-xs text-muted-foreground uppercase tracking-wider font-display font-semibold">
         {label}
       </div>
 
       {/* Value */}
-      <div className="flex items-baseline gap-1 mb-2">
-        <span className="text-3xl lg:text-4xl font-bold font-data text-foreground tracking-tight animate-count-up">
-          {value}
-        </span>
-        {suffix && (
-          <span className="text-base lg:text-lg font-data text-muted-foreground">
-            {suffix}
+      <div className="flex-1 flex items-center">
+        <div className="flex items-baseline gap-2">
+          <span className="text-5xl lg:text-[56px] font-bold font-mono text-foreground tracking-tight leading-none animate-count-up">
+            {value}
           </span>
-        )}
+          {suffix && (
+            <span className="text-xl lg:text-2xl font-mono text-muted-foreground">
+              {suffix}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Trend */}
       {trend && (
-        <div className="flex items-center gap-1.5">
-          <div className={cn("flex items-center gap-0.5", getTrendColor())}>
-            <TrendIcon className="h-3.5 w-3.5" />
-            <span className="text-xs font-semibold font-data">
+        <div className="flex items-center gap-2">
+          <div className={cn("flex items-center gap-1", getTrendColor())}>
+            <TrendIcon className="h-5 w-5" />
+            <span className="text-base font-semibold font-data">
               {trend.direction === "up" ? "+" : trend.direction === "down" ? "-" : ""}
               {trend.value}
             </span>
           </div>
-          <span className="text-[10px] text-muted-foreground">{trend.label}</span>
+          <span className="text-sm text-muted-foreground font-body">{trend.label}</span>
         </div>
       )}
     </div>
