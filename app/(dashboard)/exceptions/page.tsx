@@ -335,7 +335,7 @@ export default function ExceptionsPage() {
               </p>
             </div>
           ) : (
-            <div className="bg-white rounded-lg border border-border shadow-brutal-sm p-6 space-y-6">
+            <div className="bg-white rounded-lg border border-border shadow-brutal-sm p-4 space-y-4 max-h-[calc(100vh-140px)] overflow-y-auto">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-bold uppercase tracking-tight text-foreground">
                   Chi tiết ngoại lệ
@@ -352,37 +352,37 @@ export default function ExceptionsPage() {
               {/* Image Viewer */}
               <div className="relative bg-[#F8FAFB] rounded-lg border-2 border-border overflow-hidden">
                 <div
-                  className="aspect-[4/3] flex items-center justify-center transition-transform duration-200"
+                  className="h-[360px] flex items-center justify-center transition-transform duration-200"
                   style={{ transform: `scale(${zoom})` }}
                 >
-                  <Camera className="h-20 w-20 text-[#94A3B8]" />
+                  <Camera className="h-16 w-16 text-[#94A3B8]" />
                 </div>
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
                   <Button
                     size="sm"
                     variant="outline"
-                    className="bg-white"
+                    className="bg-white h-8 w-8 p-0"
                     onClick={() => setZoom((z) => Math.min(z + 0.25, 3))}
                   >
-                    <ZoomIn className="h-4 w-4" />
+                    <ZoomIn className="h-3.5 w-3.5" />
                   </Button>
                   <Button
                     size="sm"
                     variant="outline"
-                    className="bg-white"
+                    className="bg-white h-8 w-8 p-0"
                     onClick={() => setZoom((z) => Math.max(z - 0.25, 0.5))}
                   >
-                    <ZoomOut className="h-4 w-4" />
+                    <ZoomOut className="h-3.5 w-3.5" />
                   </Button>
                 </div>
               </div>
 
               {/* Info */}
-              <div className="border border-border rounded-lg p-4">
-                <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+              <div className="border border-border rounded-lg p-3">
+                <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
                   Thông tin
                 </div>
-                <div className="space-y-2 text-sm">
+                <div className="space-y-1.5 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Thời gian:</span>
                     <span className="font-mono font-medium text-foreground">
@@ -430,8 +430,8 @@ export default function ExceptionsPage() {
               </div>
 
               {/* Manual Input */}
-              <div className="border border-border rounded-lg p-4">
-                <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
+              <div className="border border-border rounded-lg p-3">
+                <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
                   Nhập biển số thủ công
                 </div>
                 <Input
@@ -440,22 +440,22 @@ export default function ExceptionsPage() {
                     setManualPlate(e.target.value.toUpperCase())
                   }
                   placeholder="29X1-12345"
-                  className="h-14 text-lg font-mono font-bold border-2 focus:border-primary uppercase"
+                  className="h-12 text-base font-mono font-bold border-2 focus:border-primary uppercase"
                 />
 
                 {suggestions.length > 0 && (
-                  <div className="mt-3">
-                    <div className="text-xs text-muted-foreground mb-2">
+                  <div className="mt-2">
+                    <div className="text-xs text-muted-foreground mb-1.5">
                       Gợi ý từ hệ thống:
                     </div>
-                    <div className="space-y-2">
-                      {suggestions.map((s) => (
+                    <div className="space-y-1.5">
+                      {suggestions.slice(0, 2).map((s) => (
                         <button
                           key={s.plate}
                           onClick={() => setManualPlate(s.plate)}
-                          className="w-full flex items-center justify-between p-3 bg-[#F8FAFB] rounded-md hover:bg-[#E0F7F4] transition-colors text-left"
+                          className="w-full flex items-center justify-between p-2 bg-[#F8FAFB] rounded-md hover:bg-[#E0F7F4] transition-colors text-left"
                         >
-                          <span className="font-mono font-bold text-foreground">
+                          <span className="font-mono font-bold text-sm text-foreground">
                             {s.plate}
                           </span>
                           <span className="text-xs text-muted-foreground">
@@ -467,18 +467,19 @@ export default function ExceptionsPage() {
                   </div>
                 )}
 
-                <div className="mt-4">
+                <div className="mt-3">
                   <textarea
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Ghi chú (tùy chọn)"
-                    className="w-full h-20 rounded-md border border-border bg-white px-3 py-2 text-sm resize-none focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    rows={2}
+                    className="w-full rounded-md border border-border bg-white px-3 py-2 text-sm resize-none focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                   />
                 </div>
 
-                <div className="flex gap-3 mt-4">
+                <div className="flex gap-2 mt-3">
                   <Button
-                    className="flex-1 h-12 bg-primary hover:bg-[#009B7D] text-white font-bold gap-2"
+                    className="flex-1 h-11 bg-primary hover:bg-[#009B7D] text-white font-bold gap-2"
                     disabled={!manualPlate || isResolving}
                     onClick={handleConfirmOpen}
                   >
@@ -491,7 +492,7 @@ export default function ExceptionsPage() {
                   </Button>
                   <Button
                     variant="outline"
-                    className="flex-1 h-12 border-[#EF4444] text-[#EF4444] hover:bg-[#FEE2E2] font-bold gap-2"
+                    className="flex-1 h-11 border-[#EF4444] text-[#EF4444] hover:bg-[#FEE2E2] font-bold gap-2"
                     disabled={isResolving}
                     onClick={handleDeny}
                   >
