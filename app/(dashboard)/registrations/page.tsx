@@ -230,8 +230,13 @@ export default function RegistrationsPage() {
               <p className="text-sm text-muted-foreground mt-2">
                 Thuê bao tháng
               </p>
-              <div className="text-2xl font-bold text-primary mt-4">
-                100,000đ/tháng
+              <div className="mt-4 text-center">
+                <p className="font-mono text-2xl font-bold text-primary">
+                  100,000đ
+                </p>
+                <p className="text-base text-muted-foreground">
+                  /tháng
+                </p>
               </div>
             </div>
             {registrationType === "student" && (
@@ -257,8 +262,10 @@ export default function RegistrationsPage() {
                 CÁN BỘ GIẢNG VIÊN
               </h3>
               <p className="text-sm text-muted-foreground mt-2">Đăng ký dài hạn</p>
-              <div className="text-2xl font-bold text-[#10B981] mt-4">
-                Miễn phí
+              <div className="mt-4 text-center">
+                <p className="font-mono text-2xl font-bold text-[#10B981]">
+                  Miễn phí
+                </p>
               </div>
             </div>
             {registrationType === "staff" && (
