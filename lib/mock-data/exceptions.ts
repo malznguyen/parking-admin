@@ -3,6 +3,7 @@
 import { LPRException } from '@/types/database';
 import { getRandomItem, getBusinessHourTime } from './generators';
 import { PARKING_CONFIG } from '../constants';
+import { getRandomExceptionRawImage, getRandomExceptionProcessedImage } from '../utils/image-helpers';
 
 function generateException(index: number, isPending: boolean): LPRException {
     const timestamp = getBusinessHourTime(new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000));
@@ -37,8 +38,8 @@ function generateException(index: number, isPending: boolean): LPRException {
         gate: getRandomItem(PARKING_CONFIG.GATES),
         direction: getRandomItem(['entry', 'exit'] as const),
 
-        rawImage: `/mock-images/exception-raw-${Math.floor(Math.random() * 30) + 1}.jpg`,
-        processedImage: `/mock-images/exception-processed-${Math.floor(Math.random() * 30) + 1}.jpg`,
+        rawImage: getRandomExceptionRawImage(),
+        processedImage: getRandomExceptionProcessedImage(),
         detectedPlate,
         confidence,
         errorType,
