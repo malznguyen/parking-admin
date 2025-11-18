@@ -5,11 +5,41 @@
 
 /* Industrial Neo-Brutalist Theme for HaUI Smart Parking - LIGHT THEME */
 @theme inline {
-  /* Font Variables - System fonts as fallback (Google Fonts blocked in build env) */
-  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  --font-display: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
-  --font-data: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  /* Font Variables - Professional Typography System */
+  --font-display: 'Plus Jakarta Sans', ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --font-data: 'JetBrains Mono', ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --font-sans: 'Inter', ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Typography Scale */
+  --text-hero: 120px;
+  --text-2xl: 56px;
+  --text-xl: 32px;
+  --text-lg: 24px;
+  --text-md: 18px;
+  --text-base: 16px;
+  --text-sm: 14px;
+  --text-xs: 12px;
+
+  /* Font Weight */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  /* Line Height */
+  --leading-tight: 1.1;
+  --leading-snug: 1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.6;
+
+  /* Letter Spacing */
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.05em;
+  --tracking-wider: 0.1em;
 
   /* Core Colors - Industrial Light Theme */
   --color-background: var(--background);
@@ -193,11 +223,17 @@
 }
 
 @layer utilities {
-  /* Industrial Typography Utilities */
+  /* Professional Typography Utilities */
   .font-display {
     font-family: var(--font-display);
-    font-weight: 700;
-    letter-spacing: -0.02em;
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
   }
 
   .font-data {
@@ -211,6 +247,33 @@
 
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Typography Scale Classes */
+  .text-hero {
+    font-size: var(--text-hero);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+  }
+
+  .text-2xl {
+    font-size: var(--text-2xl);
+    line-height: var(--leading-tight);
+  }
+
+  .text-xl {
+    font-size: var(--text-xl);
+    line-height: var(--leading-snug);
+  }
+
+  .text-lg {
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+  }
+
+  .text-md {
+    font-size: var(--text-md);
+    line-height: var(--leading-normal);
   }
 
   /* Light Theme Shadow System - Softer shadows */

@@ -5,6 +5,7 @@ import { HeroSection } from "@/components/dashboard/hero-section";
 import { MetricCard } from "@/components/dashboard/metric-card";
 import { ActivityChart } from "@/components/dashboard/activity-chart";
 import { RecentSessions } from "@/components/dashboard/recent-sessions";
+import { GateDistribution } from "@/components/dashboard/gate-distribution";
 import {
   getCurrentlyParkedSessions,
   mockExceptions,
@@ -64,95 +65,102 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display text-xl uppercase tracking-industrial text-foreground">
-            Tổng quan
-          </h1>
-          <p className="text-xs text-muted-foreground">
-            Trung tâm điều khiển bãi đỗ xe HaUI
-          </p>
-        </div>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={handleRefresh}
-            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors uppercase tracking-industrial"
-            disabled={isRefreshing}
-          >
-            <RefreshCw
-              className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
-            />
-            Làm mới
-          </button>
-          <div className="text-right">
-            <div className="text-xs text-muted-foreground uppercase tracking-industrial">
-              Cập nhật lúc
-            </div>
-            <div className="font-data text-sm text-foreground tabular-nums">
-              {currentTime.toLocaleTimeString("vi-VN", {
-                hour: "2-digit",
-                minute: "2-digit",
-                second: "2-digit",
-              })}
+    <div className="min-h-screen bg-[#F8FAFB] py-10">
+      <div className="mx-auto max-w-[1600px] px-10 space-y-8">
+        {/* Page Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-display text-xl font-extrabold uppercase tracking-tight text-foreground">
+              Tổng quan
+            </h1>
+            <p className="font-body text-sm text-muted-foreground mt-1">
+              Trung tâm điều khiển bãi đỗ xe HaUI
+            </p>
+          </div>
+          <div className="flex items-center gap-6">
+            <button
+              onClick={handleRefresh}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-display font-semibold uppercase tracking-wide"
+              disabled={isRefreshing}
+            >
+              <RefreshCw
+                className={`h-5 w-5 ${isRefreshing ? "animate-spin" : ""}`}
+              />
+              Làm mới
+            </button>
+            <div className="text-right">
+              <div className="text-xs text-muted-foreground uppercase tracking-wide font-display font-semibold">
+                Cập nhật lúc
+              </div>
+              <div className="font-data text-base text-foreground tabular-nums font-semibold">
+                {currentTime.toLocaleTimeString("vi-VN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Hero Section - Primary Zone */}
-      <HeroSection
-        availableSpots={availableSpots}
-        totalSpots={PARKING_CONFIG.TOTAL_SPOTS}
-        pendingExceptions={pendingExceptions.length}
-        systemStatus={
-          pendingExceptions.length > 10
-            ? "critical"
-            : pendingExceptions.length > 5
-            ? "warning"
-            : "normal"
-        }
-      />
-
-      {/* Key Metrics - 2 Column Grid */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <MetricCard
-          label="Doanh thu hôm nay"
-          value={formatCurrency(todayRevenue)}
-          suffix="đ"
-          trend={{
-            value: formatCurrency(Math.abs(revenueTrend)),
-            label: "so với hôm qua",
-            direction: revenueTrend >= 0 ? "up" : "down",
-            isPositive: revenueTrend >= 0,
-          }}
-          accentColor="success"
-          animationDelay={200}
+        {/* Hero Section - Primary Zone */}
+        <HeroSection
+          availableSpots={availableSpots}
+          totalSpots={PARKING_CONFIG.TOTAL_SPOTS}
+          pendingExceptions={pendingExceptions.length}
+          systemStatus={
+            pendingExceptions.length > 10
+              ? "critical"
+              : pendingExceptions.length > 5
+              ? "warning"
+              : "normal"
+          }
         />
-        <MetricCard
-          label="Xe đang đỗ"
-          value={currentlyParked.length}
-          suffix="xe"
-          trend={{
-            value: Math.abs(parkedTrend),
-            label: "hôm nay",
-            direction: parkedTrend >= 0 ? "up" : "down",
-            isPositive: true, // More cars = more revenue
-          }}
-          accentColor="info"
-          animationDelay={300}
-        />
-      </div>
 
-      {/* Activity Chart Section - Secondary Zone */}
-      <div className="animate-slide-in-up" style={{ animationDelay: "400ms" }}>
-        <ActivityChart />
-      </div>
+        {/* Key Metrics - 2 Column Grid */}
+        <div className="grid gap-8 md:grid-cols-2">
+          <MetricCard
+            label="Doanh thu hôm nay"
+            value={formatCurrency(todayRevenue)}
+            suffix="đ"
+            trend={{
+              value: formatCurrency(Math.abs(revenueTrend)),
+              label: "so với hôm qua",
+              direction: revenueTrend >= 0 ? "up" : "down",
+              isPositive: revenueTrend >= 0,
+            }}
+            accentColor="success"
+            animationDelay={200}
+          />
+          <MetricCard
+            label="Xe đang đỗ"
+            value={currentlyParked.length}
+            suffix="xe"
+            trend={{
+              value: Math.abs(parkedTrend),
+              label: "hôm nay",
+              direction: parkedTrend >= 0 ? "up" : "down",
+              isPositive: true, // More cars = more revenue
+            }}
+            accentColor="info"
+            animationDelay={300}
+          />
+        </div>
 
-      {/* Recent Sessions - Tertiary Zone */}
-      <div className="animate-slide-in-up" style={{ animationDelay: "500ms" }}>
-        <RecentSessions />
+        {/* Activity Chart Section - Secondary Zone */}
+        <div className="animate-slide-in-up" style={{ animationDelay: "400ms" }}>
+          <ActivityChart />
+        </div>
+
+        {/* Bottom Grid - Activity + Gates */}
+        <div className="grid gap-8 md:grid-cols-5 animate-slide-in-up" style={{ animationDelay: "500ms" }}>
+          <div className="md:col-span-3">
+            <RecentSessions />
+          </div>
+          <div className="md:col-span-2">
+            <GateDistribution />
+          </div>
+        </div>
       </div>
     </div>
   );

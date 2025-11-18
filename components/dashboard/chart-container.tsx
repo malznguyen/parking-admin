@@ -19,17 +19,17 @@ export function ChartContainer({
   return (
     <div
       className={cn(
-        "rounded-md bg-card border-brutal border-border p-4 shadow-brutal-sm animate-fade-scale-in",
+        "rounded-2xl bg-card border border-border p-8 shadow-[0_2px_8px_rgba(0,0,0,0.06)] animate-fade-scale-in",
         className
       )}
     >
-      <div className="mb-3 flex items-start justify-between">
+      <div className="mb-6 flex items-start justify-between">
         <div>
-          <h3 className="font-display text-sm uppercase tracking-industrial text-foreground">
+          <h3 className="font-display text-base uppercase tracking-wide text-foreground font-bold">
             {title}
           </h3>
           {subtitle && (
-            <p className="text-xs text-muted-foreground">{subtitle}</p>
+            <p className="text-sm text-muted-foreground font-body mt-1">{subtitle}</p>
           )}
         </div>
         {action && <div>{action}</div>}

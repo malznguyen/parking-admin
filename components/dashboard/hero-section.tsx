@@ -60,7 +60,7 @@ export function HeroSection({
   const StatusIcon = statusConfig.Icon;
 
   return (
-    <div className="relative overflow-hidden rounded-xl bg-card border-l-4 border-l-primary border border-border shadow-lg animate-fade-scale-in">
+    <div className="relative overflow-hidden rounded-2xl bg-card border-l-[6px] border-l-primary border border-border shadow-[0_4px_12px_rgba(0,0,0,0.08)] animate-fade-scale-in min-h-[280px]">
       {/* Subtle background pattern */}
       <div className="absolute inset-0 opacity-[0.02]">
         <div
@@ -72,51 +72,53 @@ export function HeroSection({
         />
       </div>
 
-      <div className="relative p-5">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <div className="relative p-10">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
           {/* Left Side - Capacity Display (60%) */}
           <div className="lg:col-span-3 flex flex-col justify-center">
-            <div className="text-[10px] text-muted-foreground uppercase tracking-industrial font-semibold mb-2">
+            <div className="text-xs text-muted-foreground uppercase tracking-wider font-display font-semibold mb-4">
               TRẠNG THÁI BÃI XE HIỆN TẠI
             </div>
 
             {/* Giant Number Display */}
-            <div className="flex items-baseline gap-2 mb-3">
+            <div className="flex items-baseline gap-3 mb-6">
               <span
                 className={cn(
-                  "text-5xl lg:text-6xl font-bold font-data tracking-tight leading-none animate-count-up",
+                  "text-8xl lg:text-[120px] font-extrabold font-display tracking-tight leading-none animate-count-up",
                   getCapacityColor()
                 )}
               >
                 {availableSpots}
               </span>
-              <span className="text-2xl lg:text-3xl font-data text-muted-foreground/50">
+              <span className="text-5xl lg:text-6xl font-display font-bold text-muted-foreground/50">
                 /{totalSpots}
               </span>
             </div>
 
-            <div className="text-xs text-muted-foreground uppercase tracking-industrial font-medium mb-2">
-              CHỖ TRỐNG
+            <div className="text-sm text-muted-foreground uppercase tracking-wider font-display font-semibold mb-4">
+              Chỗ trống
             </div>
 
             {/* Progress Bar */}
-            <div className="w-full max-w-xl">
-              <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
+            <div className="w-full max-w-2xl">
+              <div className="h-6 w-full rounded-full bg-muted overflow-hidden shadow-inner">
                 <div
                   className={cn(
-                    "h-full rounded-full transition-all duration-1000 ease-out",
-                    getProgressColor()
+                    "h-full rounded-full transition-all duration-1000 ease-out bg-gradient-to-r",
+                    occupancyRate >= 90 ? "from-danger via-danger/90 to-danger" :
+                    occupancyRate >= 75 ? "from-warning via-warning/90 to-warning" :
+                    "from-primary via-cyan-500 to-primary"
                   )}
                   style={{
                     width: `${occupancyRate}%`,
                   }}
                 />
               </div>
-              <div className="mt-1 flex items-center justify-between text-xs">
+              <div className="mt-2 flex items-center justify-between text-base">
                 <span className="font-data font-semibold text-foreground">
                   {occupancyRate.toFixed(1)}% Đã sử dụng
                 </span>
-                <span className="text-muted-foreground">
+                <span className="font-body text-muted-foreground">
                   {totalSpots - availableSpots} xe đang đỗ
                 </span>
               </div>
@@ -124,23 +126,23 @@ export function HeroSection({
           </div>
 
           {/* Right Side - Status Panel (40%) */}
-          <div className="lg:col-span-2 flex flex-col justify-center">
+          <div className="lg:col-span-2 flex flex-col justify-center gap-6">
             {/* System Status */}
             <div
               className={cn(
-                "rounded-lg border p-4 mb-3",
+                "rounded-2xl border-2 p-5 h-14 flex items-center",
                 statusConfig.color
               )}
             >
-              <div className="flex items-center gap-2">
-                <StatusIcon className={cn("h-6 w-6", statusConfig.iconColor)} />
+              <div className="flex items-center gap-3">
+                <StatusIcon className={cn("h-7 w-7", statusConfig.iconColor)} />
                 <div>
-                  <div className="text-[10px] text-muted-foreground uppercase tracking-industrial">
-                    TRẠNG THÁI
+                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-display font-semibold">
+                    Tình trạng
                   </div>
                   <div
                     className={cn(
-                      "text-sm font-bold uppercase tracking-industrial",
+                      "text-base font-bold uppercase tracking-wide font-display",
                       statusConfig.iconColor
                     )}
                   >
@@ -154,24 +156,24 @@ export function HeroSection({
             {pendingExceptions > 0 && (
               <div
                 className={cn(
-                  "rounded-lg border p-3",
+                  "rounded-xl border-2 p-5",
                   pendingExceptions > 5
-                    ? "bg-danger/10 border-danger/30"
-                    : "bg-warning/10 border-warning/30"
+                    ? "bg-[#FEE2E2] border-danger/50"
+                    : "bg-[#FEF3C7] border-warning/50"
                 )}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <AlertTriangle
                     className={cn(
-                      "h-5 w-5",
+                      "h-6 w-6",
                       pendingExceptions > 5 ? "text-danger" : "text-warning"
                     )}
                   />
                   <div>
-                    <div className="flex items-baseline gap-1">
+                    <div className="flex items-baseline gap-2">
                       <span
                         className={cn(
-                          "text-lg font-bold font-data",
+                          "text-2xl font-bold font-data",
                           pendingExceptions > 5
                             ? "text-danger"
                             : "text-warning"
@@ -179,7 +181,7 @@ export function HeroSection({
                       >
                         {pendingExceptions}
                       </span>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-sm text-foreground/80 font-body">
                         Ngoại lệ chờ xử lý
                       </span>
                     </div>
