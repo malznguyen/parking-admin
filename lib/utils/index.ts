@@ -77,3 +77,17 @@ export {
   exportExceptions,
   generateRevenueReport,
 } from './export';
+
+// Image utilities
+export {
+  getRandomEntryImage,
+  getRandomExitImage,
+  getRandomExceptionRawImage,
+  getRandomExceptionProcessedImage,
+  getFallbackImage,
+  isValidImagePath,
+  getEntryImage,
+  getExitImage,
+  getExceptionRawImage,
+  getExceptionProcessedImage,
+} from './image-helpers';

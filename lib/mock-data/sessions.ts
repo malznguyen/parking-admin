@@ -8,6 +8,7 @@ import {
     getBusinessHourTime,
 } from './generators';
 import { PARKING_CONFIG } from '../constants';
+import { getRandomEntryImage, getRandomExitImage } from '../utils/image-helpers';
 
 function calculateFee(entryTime: Date, exitTime: Date, isRegistered: boolean): number {
     if (isRegistered) return 0; // Miễn phí hoặc đã trả trước
@@ -73,13 +74,13 @@ function generateSession(date: Date, isCurrentlyParked: boolean, index: number):
 
         entryTime: entryTime.toISOString(),
         entryGate: getRandomItem(PARKING_CONFIG.GATES),
-        entryImage: `/mock-images/entry-${Math.floor(Math.random() * 20) + 1}.jpg`,
+        entryImage: getRandomEntryImage(),
         entryConfidence,
         entryOperator: entryConfidence === 'failed' ? 'operator_001' : undefined,
 
         exitTime: exitTime?.toISOString(),
         exitGate: exitTime ? getRandomItem(PARKING_CONFIG.GATES) : undefined,
-        exitImage: exitTime ? `/mock-images/exit-${Math.floor(Math.random() * 20) + 1}.jpg` : undefined,
+        exitImage: exitTime ? getRandomExitImage() : undefined,
         exitConfidence,
         exitOperator: exitConfidence === 'failed' ? 'operator_002' : undefined,
 

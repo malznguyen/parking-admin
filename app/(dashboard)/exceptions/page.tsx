@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { ParkingImage } from "@/components/parking-image";
 import { formatDistanceToNow, format } from "date-fns";
 import { vi } from "date-fns/locale";
 
@@ -272,8 +273,14 @@ export default function ExceptionsPage() {
 
                   {/* Content */}
                   <div className="flex gap-4">
-                    <div className="w-32 h-24 bg-[#F1F5F9] rounded-md border border-border flex items-center justify-center">
-                      <Camera className="h-8 w-8 text-[#94A3B8]" />
+                    <div className="relative w-32 h-24 bg-[#F1F5F9] rounded-md border border-border overflow-hidden flex-shrink-0">
+                      <ParkingImage
+                        src={exception.rawImage}
+                        alt={`Exception thumbnail - ${exception.id}`}
+                        type="exception"
+                        className="w-full h-full"
+                        objectFit="cover"
+                      />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
@@ -350,31 +357,62 @@ export default function ExceptionsPage() {
               </div>
 
               {/* Image Viewer */}
-              <div className="relative bg-[#F8FAFB] rounded-lg border-2 border-border overflow-hidden">
-                <div
-                  className="h-[360px] flex items-center justify-center transition-transform duration-200"
-                  style={{ transform: `scale(${zoom})` }}
-                >
-                  <Camera className="h-16 w-16 text-[#94A3B8]" />
+              <div className="space-y-3">
+                {/* Raw Camera Image */}
+                <div>
+                  <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+                    Hình ảnh camera gốc
+                  </div>
+                  <div className="relative bg-[#F8FAFB] rounded-lg border-2 border-border overflow-hidden">
+                    <div
+                      className="h-[360px] transition-transform duration-200"
+                      style={{ transform: `scale(${zoom})` }}
+                    >
+                      <ParkingImage
+                        src={selectedException.rawImage}
+                        alt={`Exception raw image - ${selectedException.id}`}
+                        type="exception"
+                        className="h-full w-full"
+                        priority
+                      />
+                    </div>
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="bg-white h-8 w-8 p-0"
+                        onClick={() => setZoom((z) => Math.min(z + 0.25, 3))}
+                      >
+                        <ZoomIn className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="bg-white h-8 w-8 p-0"
+                        onClick={() => setZoom((z) => Math.max(z - 0.25, 0.5))}
+                      >
+                        <ZoomOut className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="bg-white h-8 w-8 p-0"
-                    onClick={() => setZoom((z) => Math.min(z + 0.25, 3))}
-                  >
-                    <ZoomIn className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="bg-white h-8 w-8 p-0"
-                    onClick={() => setZoom((z) => Math.max(z - 0.25, 0.5))}
-                  >
-                    <ZoomOut className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
+
+                {/* Processed Image */}
+                {selectedException.processedImage && (
+                  <div>
+                    <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+                      Hình ảnh đã xử lý
+                    </div>
+                    <div className="relative h-[200px] bg-[#F8FAFB] rounded-lg border border-border overflow-hidden">
+                      <ParkingImage
+                        src={selectedException.processedImage}
+                        alt={`Exception processed image - ${selectedException.id}`}
+                        type="exception"
+                        className="h-full w-full"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Info */}
